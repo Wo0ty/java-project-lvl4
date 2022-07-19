@@ -8,6 +8,10 @@ plugins {
 group 'hexlet.code'
 version '1.0-SNAPSHOT'
 
+application {
+    mainClass = 'hexlet.code.App'
+}
+
 repositories {
     mavenCentral()
 }
@@ -24,11 +28,6 @@ dependencies {
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
-}
-
-jacoco {
-    toolVersion = "0.8.8"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
 }
 
 jacocoTestReport {
