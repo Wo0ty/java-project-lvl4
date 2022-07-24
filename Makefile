@@ -1,15 +1,34 @@
+setup:
+	gradle wrapper --gradle-version 7.4
+
 clean:
 	./gradlew clean
 
-.PHONY: build
 build:
 	./gradlew clean build
 
-install: clean
+start:
+	APP_ENV=development ./gradlew run
+
+install:
 	./gradlew install
 
-run-dist:
-	./build/install/app/bin/app
+start-dist:
+	APP_ENV=production ./build/install/app/bin/app
+
+generate-migrations:
+	./gradlew generateMigrations
 
 lint:
 	./gradlew checkstyleMain checkstyleTest
+
+test:
+	./gradlew test
+
+report:
+	./gradlew jacocoTestReport
+
+check-updates:
+	./gradlew dependencyUpdates
+
+.PHONY: build

@@ -1,0 +1,9 @@
+datasource:
+  db:
+    username: sa
+    password: sa
+    url: "jdbc:h2:./hexlet"
+
+ebean:
+  migration:
+    run: true
