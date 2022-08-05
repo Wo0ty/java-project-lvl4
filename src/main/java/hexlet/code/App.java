@@ -1,11 +1,57 @@
 package hexlet.code;
 
+import hexlet.code.controllers.RootController;
 import io.javalin.Javalin;
+import io.javalin.plugin.rendering.template.JavalinThymeleaf;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 public class App {
 
+    public static void main(String[] args) {
+        Javalin app = getApp();
+        app.start(getPort());
+    }
+
+    public static Javalin getApp() {
+        Javalin app = Javalin.create(config -> {
+            if (!isProduction()) {
+                config.enableDevLogging();
+            }
+
+            JavalinThymeleaf.configure(getTemplateEngine());
+            config.enableWebjars();
+        });
+
+        addRoutes(app);
+
+        app.before(ctx -> {
+            ctx.attribute("ctx", ctx);
+        });
+
+        return app;
+    }
+
+    private static void addRoutes(Javalin app) {
+        //app.get("/", ctx -> ctx.result("Hello World"));
+        app.get("/", RootController.getIndex());
+
+//        app.routes(() -> {
+//            path("articles", () -> {
+//                get(ArticleController.listArticles);
+//                post(ArticleController.createArticle);
+//                get("new", ArticleController.newArticle);
+//                path("{id}", () -> {
+//                    get(ArticleController.showArticle);
+//                });
+//            });
+//        });
+    }
+
     private static int getPort() {
-        String port = System.getenv().getOrDefault("PORT", "3000");
+        String port = System.getenv().getOrDefault("PORT", "8080");
         return Integer.valueOf(port);
     }
 
@@ -17,25 +63,16 @@ public class App {
         return getMode().equals("production");
     }
 
-    public static Javalin getApp() {
-        Javalin app = Javalin.create(config -> {
-            if (!isProduction()) {
-                config.enableDevLogging();
-            }
-            //config.enableWebjars();
-        });
+    private static TemplateEngine getTemplateEngine() {
+        TemplateEngine templateEngine = new TemplateEngine();
 
-        app.get("/", ctx -> ctx.result("Hello World"));
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/templates/");
 
-        app.before(ctx -> {
-            ctx.attribute("ctx", ctx);
-        });
+        templateEngine.addTemplateResolver(templateResolver);
+        templateEngine.addDialect(new LayoutDialect());
+        templateEngine.addDialect(new Java8TimeDialect());
 
-        return app;
-    }
-
-    public static void main(String[] args) {
-        Javalin app = getApp();
-        app.start(getPort());
+        return templateEngine;
     }
 }
