@@ -7,5 +7,4 @@ build
 # Ignore idea directory
 .idea
 
-database.trace.db
-database.mv.db
+.db
