@@ -2,25 +2,16 @@ package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.query.QUrl;
-
+import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 
 import java.net.URL;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class UrlController {
-    public static Handler listUrl() {
-        return list;
-    }
-
-    public static Handler createUrl() {
-        return create;
-    }
-
-    public static Handler showUrl() {
-        return show;
-    }
+public final class UrlController {
 
     private static Handler show = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
@@ -38,8 +29,28 @@ public class UrlController {
     };
 
     private static Handler list = ctx -> {
-        List<Url> dbUrls = new QUrl()
-                .findList();
+
+        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
+        final int rowsPerPage = 10;
+
+        PagedList<Url> pagedUrls = new QUrl()
+                .setFirstRow(page * rowsPerPage)
+                .setMaxRows(rowsPerPage)
+                .orderBy()
+                .id.asc()
+                .findPagedList();
+
+        List<Url> dbUrls = pagedUrls.getList();
+
+        int lastPage = pagedUrls.getTotalPageCount() + 1;
+        int currentPage = pagedUrls.getPageIndex() + 1;
+        List<Integer> pages = IntStream
+                .range(1, lastPage)
+                .boxed()
+                .collect(Collectors.toList());
+
+        ctx.attribute("pages", pages);
+        ctx.attribute("currentPage", currentPage);
 
         ctx.attribute("urls", dbUrls);
         ctx.render("urls/list.html");
@@ -57,7 +68,7 @@ public class UrlController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.render("urls/list.html");
+            ctx.render("/index.html");
             return;
         }
 
@@ -70,7 +81,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.attribute("url", url);
-            ctx.render("urls/list.html");
+            ctx.render("/index.html");
             return;
         }
 
@@ -78,6 +89,18 @@ public class UrlController {
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
-        ctx.render("urls/list.html");
+        ctx.render("/index.html");
     };
+
+    public static Handler listUrl() {
+        return list;
+    }
+
+    public static Handler createUrl() {
+        return create;
+    }
+
+    public static Handler showUrl() {
+        return show;
+    }
 }
