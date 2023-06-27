@@ -1,6 +1,7 @@
-package hexlet.code.model;
+package hexlet.code.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
@@ -8,8 +9,7 @@ import java.time.Instant;
 
 @Entity
 public final class Url extends Model {
-
-    @Id
+    @Id @GeneratedValue
     private long id;
 
     private String name;

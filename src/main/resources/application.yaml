@@ -1,8 +1,8 @@
 datasource:
   default: ${APP_ENV}
   development:
-    username: sa
-    password: sa
+    username: ""
+    password: ""
     url: "jdbc:h2:./database"
   production:
     username: ${PGUSER}
@@ -10,5 +10,9 @@ datasource:
     url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
 
 ebean:
-  migration:
-    run: true
+  development:
+    migration:
+      run: true
+  production:
+    migration:
+      run: true

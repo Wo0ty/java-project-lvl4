@@ -1,7 +1,7 @@
 package hexlet.code.controllers;
 
-import hexlet.code.model.Url;
-import hexlet.code.model.query.QUrl;
+import hexlet.code.domain.Url;
+import hexlet.code.domain.query.QUrl;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;

@@ -27,7 +27,6 @@ public class App {
             }
 
             JavalinThymeleaf.init(getTemplateEngine());
-            //config.enableWebjars();
         });
 
         addRoutes(app);
@@ -40,7 +39,6 @@ public class App {
     }
 
     private static void addRoutes(Javalin app) {
-        //app.get("/", ctx -> ctx.result("Hello World"));
         app.get("/", RootController.getIndex());
 
         app.routes(() -> {
