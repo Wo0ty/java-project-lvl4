@@ -1,17 +1,14 @@
 setup:
 	gradle wrapper --gradle-version 7.4
 
-clean:
-	./gradlew clean
-
 build:
 	./gradlew clean build
 
-start:
-	APP_ENV=development ./gradlew run
-
 install:
 	./gradlew install
+
+start: build
+	APP_ENV=development ./gradlew run
 
 start-dist:
 	APP_ENV=production ./build/install/app/bin/app

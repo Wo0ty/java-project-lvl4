@@ -5,15 +5,20 @@ import hexlet.code.controllers.UrlController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class App {
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
         Javalin app = getApp();
@@ -26,6 +31,7 @@ public class App {
                 config.plugins.enableDevLogging();
             }
 
+            config.staticFiles.enableWebjars();
             JavalinThymeleaf.init(getTemplateEngine());
         });
 
@@ -42,7 +48,7 @@ public class App {
         app.get("/", RootController.getIndex());
 
         app.routes(() -> {
-            path("urls", () -> {
+            path("/urls", () -> {
                 get(UrlController.listUrl());
                 post(UrlController.createUrl());
                 path("{id}", () -> {
@@ -53,12 +59,15 @@ public class App {
     }
 
     private static int getPort() {
-        String port = System.getenv().getOrDefault("PORT", "8080");
+        String port = System.getenv().getOrDefault("PORT", "8090");
+        LOGGER.info("Port: {}", port);
         return Integer.valueOf(port);
     }
 
     private static String getMode() {
-        return System.getenv().getOrDefault("APP_ENV", "development");
+        String mode = System.getenv().getOrDefault("APP_ENV", "development");
+        LOGGER.info("Mode: {}", mode);
+        return mode;
     }
 
     private static boolean isProduction() {

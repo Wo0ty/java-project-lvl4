@@ -11,7 +11,6 @@ import java.time.Instant;
 public final class Url extends Model {
     @Id @GeneratedValue
     private long id;
-
     private String name;
 
     @WhenCreated

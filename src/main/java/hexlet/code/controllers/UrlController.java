@@ -5,6 +5,8 @@ import hexlet.code.domain.query.QUrl;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.List;
@@ -12,6 +14,20 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public final class UrlController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class);
+
+    public static Handler listUrl() {
+        return list;
+    }
+
+    public static Handler createUrl() {
+        return create;
+    }
+
+    public static Handler showUrl() {
+        return show;
+    }
 
     private static Handler show = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
@@ -29,10 +45,10 @@ public final class UrlController {
     };
 
     private static Handler list = ctx -> {
-
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
         final int rowsPerPage = 10;
 
+        LOGGER.info("Request URL list");
         PagedList<Url> pagedUrls = new QUrl()
                 .setFirstRow(page * rowsPerPage)
                 .setMaxRows(rowsPerPage)
@@ -40,10 +56,11 @@ public final class UrlController {
                 .id.asc()
                 .findPagedList();
 
-        List<Url> dbUrls = pagedUrls.getList();
+        List<Url> urls = pagedUrls.getList();
 
         int lastPage = pagedUrls.getTotalPageCount() + 1;
         int currentPage = pagedUrls.getPageIndex() + 1;
+
         List<Integer> pages = IntStream
                 .range(1, lastPage)
                 .boxed()
@@ -52,33 +69,35 @@ public final class UrlController {
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
 
-        ctx.attribute("urls", dbUrls);
-        ctx.render("urls/list.html");
+        ctx.attribute("urls", urls);
+        ctx.render("urls.html");
     };
 
     private static Handler create = ctx -> {
         String name = ctx.formParam("url");
-        String parsedUrl = "";
+        String checkedUrl = "";
+
         try {
             URL aURL = new URL(name);
-            parsedUrl = aURL.getProtocol() + "://" +  aURL.getHost();
+            checkedUrl = aURL.getProtocol() + "://" +  aURL.getHost();
             if (aURL.getPort() > 0) {
-                parsedUrl = parsedUrl + ":" +  aURL.getPort();
+                checkedUrl = checkedUrl + ":" +  aURL.getPort();
             }
         } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Некорректный URL");
+            LOGGER.info("Invalid URL");
+            ctx.sessionAttribute("flash", "Incorrect URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.render("/index.html");
             return;
         }
 
-        Url url = new Url(parsedUrl);
+        Url url = new Url(checkedUrl);
         Url dbUrl = new QUrl()
-                .name.equalTo(parsedUrl)
+                .name.equalTo(checkedUrl)
                 .findOne();
 
         if (dbUrl != null) {
-            ctx.sessionAttribute("flash", "Страница уже существует");
+            ctx.sessionAttribute("flash", "Url already exists");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.attribute("url", url);
             ctx.render("/index.html");
@@ -87,20 +106,8 @@ public final class UrlController {
 
         url.save();
 
-        ctx.sessionAttribute("flash", "Страница успешно добавлена");
+        ctx.sessionAttribute("flash", "Page added successfully");
         ctx.sessionAttribute("flash-type", "success");
         ctx.render("/index.html");
     };
-
-    public static Handler listUrl() {
-        return list;
-    }
-
-    public static Handler createUrl() {
-        return create;
-    }
-
-    public static Handler showUrl() {
-        return show;
-    }
 }
