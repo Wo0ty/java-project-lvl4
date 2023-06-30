@@ -1,10 +1,17 @@
 package hexlet.code.controllers;
 
 import hexlet.code.domain.Url;
+import hexlet.code.domain.UrlCheck;
 import hexlet.code.domain.query.QUrl;
+import hexlet.code.domain.query.QUrlCheck;
+import hexlet.code.util.ResponseParser;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,34 +24,7 @@ public final class UrlController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class);
 
-    public static Handler listUrl() {
-        return list;
-    }
-
-    public static Handler createUrl() {
-        return create;
-    }
-
-    public static Handler showUrl() {
-        return show;
-    }
-
-    private static Handler show = ctx -> {
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
-
-        Url dbUrl = new QUrl()
-                .id.equalTo(id)
-                .findOne();
-
-        if (dbUrl == null) {
-            throw new NotFoundResponse();
-        }
-
-        ctx.attribute("url", dbUrl);
-        ctx.render("urls/show.html");
-    };
-
-    private static Handler list = ctx -> {
+    public static final Handler URL_LIST = ctx -> {
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
         final int rowsPerPage = 10;
 
@@ -52,8 +32,7 @@ public final class UrlController {
         PagedList<Url> pagedUrls = new QUrl()
                 .setFirstRow(page * rowsPerPage)
                 .setMaxRows(rowsPerPage)
-                .orderBy()
-                .id.asc()
+                .orderBy().id.asc()
                 .findPagedList();
 
         List<Url> urls = pagedUrls.getList();
@@ -73,7 +52,7 @@ public final class UrlController {
         ctx.render("urls.html");
     };
 
-    private static Handler create = ctx -> {
+    public static final Handler CREATE_URL = ctx -> {
         String name = ctx.formParam("url");
         String checkedUrl = "";
 
@@ -109,5 +88,62 @@ public final class UrlController {
         ctx.sessionAttribute("flash", "Page added successfully");
         ctx.sessionAttribute("flash-type", "success");
         ctx.render("/index.html");
+    };
+
+    public static final Handler SHOW_URL = ctx -> {
+        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+
+        Url url = new QUrl()
+                .id.equalTo(id)
+                .findOne();
+
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
+
+        List<UrlCheck> urlChecks = new QUrlCheck()
+                .url.equalTo(url)
+                .orderBy().id.asc()
+                .findList();
+
+        ctx.attribute("url", url);
+        ctx.attribute("urlChecks", urlChecks);
+        ctx.render("show.html");
+    };
+
+    public static final Handler CHECK_URL = ctx -> {
+        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+
+        Url url = new QUrl()
+                .id.equalTo(id)
+                .findOne();
+
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
+
+        try {
+            HttpResponse<String> response = Unirest
+                    .get(url.getName())
+                    .asString();
+
+            ResponseParser urlParser = new ResponseParser(response);
+
+            int statusCode = urlParser.getStatusCode();
+            String title = urlParser.getTitle();
+            String h1 = urlParser.getH1();
+            String description = urlParser.getDescription();
+
+            UrlCheck checkResult = new UrlCheck(statusCode, title, h1, description, url);
+
+            checkResult.save();
+
+            ctx.sessionAttribute("flash", "Page verified successfully");
+            ctx.sessionAttribute("flash-type", "success");
+        } catch (UnirestException e) {
+            ctx.sessionAttribute("flash", "Failed to check page");
+            ctx.sessionAttribute("flash-type", "danger");
+        }
+        ctx.redirect("/urls/" + id);
     };
 }

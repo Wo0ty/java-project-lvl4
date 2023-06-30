@@ -1,13 +1,13 @@
 setup:
 	gradle wrapper --gradle-version 7.4
 
-build:
+build: generate-migrations
 	./gradlew clean build
 
 install:
 	./gradlew install
 
-start: build
+start: build generate-migrations
 	APP_ENV=development ./gradlew run
 
 start-dist:

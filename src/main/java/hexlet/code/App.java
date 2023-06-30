@@ -49,10 +49,11 @@ public class App {
 
         app.routes(() -> {
             path("/urls", () -> {
-                get(UrlController.listUrl());
-                post(UrlController.createUrl());
+                get(UrlController.URL_LIST);
+                post(UrlController.CREATE_URL);
                 path("{id}", () -> {
-                    get(UrlController.showUrl());
+                    get(UrlController.SHOW_URL);
+                    post("/check", UrlController.CHECK_URL);
                 });
             });
         });
