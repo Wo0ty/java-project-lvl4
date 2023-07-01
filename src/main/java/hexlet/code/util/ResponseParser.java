@@ -3,6 +3,7 @@ package hexlet.code.util;
 import kong.unirest.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public final class ResponseParser {
     private Document body;
@@ -16,9 +17,8 @@ public final class ResponseParser {
         statusCode = response.getStatus();
 
         title = body.title();
-        h1 = body.selectFirst("h1") != null ? body.selectFirst("h1").text() : null;
-        description = body.selectFirst("meta[name=description]") != null
-                ? body.selectFirst("meta[name=description]").attr("content") : null;
+        h1 = setH1();
+        description = setDescription();
     }
 
     public String getTitle() {
@@ -35,5 +35,21 @@ public final class ResponseParser {
 
     public int getStatusCode() {
         return statusCode;
+    }
+
+    private String setH1() {
+        Element element = body.selectFirst("h1");
+        if (element != null) {
+            return element.text();
+        }
+        return null;
+    }
+
+    private String setDescription() {
+        Element element = body.selectFirst("meta[name=description]");
+        if (element != null) {
+            return element.attr("content");
+        }
+        return null;
     }
 }

@@ -7,7 +7,10 @@ build: generate-migrations
 install:
 	./gradlew install
 
-start: build generate-migrations
+clean:
+	./gradlew clean
+
+start: build
 	APP_ENV=development ./gradlew run
 
 start-dist:

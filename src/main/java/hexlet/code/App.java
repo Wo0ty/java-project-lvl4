@@ -1,7 +1,7 @@
 package hexlet.code;
 
-import hexlet.code.controllers.RootController;
-import hexlet.code.controllers.UrlController;
+import hexlet.code.controller.RootController;
+import hexlet.code.controller.UrlController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
@@ -50,7 +50,7 @@ public class App {
         app.routes(() -> {
             path("/urls", () -> {
                 get(UrlController.URL_LIST);
-                post(UrlController.CREATE_URL);
+                post(UrlController.ADD_URL);
                 path("{id}", () -> {
                     get(UrlController.SHOW_URL);
                     post("/check", UrlController.CHECK_URL);

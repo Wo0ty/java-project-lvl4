@@ -40,4 +40,8 @@ public final class Url extends Model {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
+    public List<UrlCheck> getUrlchecks() {
+        return urlchecks;
+    }
 }

@@ -1,10 +1,11 @@
-package hexlet.code.controllers;
+package hexlet.code.controller;
 
 import hexlet.code.domain.Url;
 import hexlet.code.domain.UrlCheck;
 import hexlet.code.domain.query.QUrl;
 import hexlet.code.domain.query.QUrlCheck;
 import hexlet.code.util.ResponseParser;
+import hexlet.code.util.UrlDetails;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
@@ -15,8 +16,10 @@ import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,14 +48,20 @@ public final class UrlController {
                 .boxed()
                 .collect(Collectors.toList());
 
+        Map<Url, UrlDetails> urlLastCheckDetails = urls.stream()
+                .collect(Collectors.toMap(
+                        (url) -> url,
+                        UrlDetails::new));
+
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
-
+        ctx.attribute("urlLastCheckDetails", urlLastCheckDetails);
         ctx.attribute("urls", urls);
+
         ctx.render("urls.html");
     };
 
-    public static final Handler CREATE_URL = ctx -> {
+    public static final Handler ADD_URL = ctx -> {
         String name = ctx.formParam("url");
         String checkedUrl = "";
 
@@ -62,7 +71,7 @@ public final class UrlController {
             if (aURL.getPort() > 0) {
                 checkedUrl = checkedUrl + ":" +  aURL.getPort();
             }
-        } catch (Exception e) {
+        } catch (MalformedURLException e) {
             LOGGER.info("Invalid URL");
             ctx.sessionAttribute("flash", "Incorrect URL");
             ctx.sessionAttribute("flash-type", "danger");
@@ -93,6 +102,8 @@ public final class UrlController {
     public static final Handler SHOW_URL = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
+        LOGGER.info("Preparing the page for url with ID {} ", id);
+
         Url url = new QUrl()
                 .id.equalTo(id)
                 .findOne();
@@ -101,6 +112,7 @@ public final class UrlController {
             throw new NotFoundResponse();
         }
 
+        LOGGER.info("Request URL check list");
         List<UrlCheck> urlChecks = new QUrlCheck()
                 .url.equalTo(url)
                 .orderBy().id.asc()
@@ -114,6 +126,8 @@ public final class UrlController {
     public static final Handler CHECK_URL = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
+        LOGGER.info("Checking URL with ID {}", id);
+
         Url url = new QUrl()
                 .id.equalTo(id)
                 .findOne();
@@ -123,6 +137,7 @@ public final class UrlController {
         }
 
         try {
+            LOGGER.info("GET request to {}", url.getName());
             HttpResponse<String> response = Unirest
                     .get(url.getName())
                     .asString();
@@ -136,6 +151,7 @@ public final class UrlController {
 
             UrlCheck checkResult = new UrlCheck(statusCode, title, h1, description, url);
 
+            LOGGER.info("URL {} was checked, saving parsed data to database", url.getName());
             checkResult.save();
 
             ctx.sessionAttribute("flash", "Page verified successfully");
