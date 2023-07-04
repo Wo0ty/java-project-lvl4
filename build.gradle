@@ -7,7 +7,7 @@ plugins {
     id 'jacoco'
 }
 
-group = 'io.hexlet'
+group = 'hexlet.code'
 version = '1.0-SNAPSHOT'
 
 repositories {
@@ -40,12 +40,12 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
     implementation 'org.postgresql:postgresql:42.5.4'
 
-    implementation 'io.ebean:ebean:12.15.1'
-    implementation 'io.ebean:ebean-ddl-generator:12.15.1'
+    implementation 'io.ebean:ebean:13.15.0'
+    implementation 'io.ebean:ebean-ddl-generator:13.15.0'
     implementation 'io.ebean:ebean-querybean:12.15.1'
-    implementation 'io.ebean:ebean-migration:12.15.1'
-    implementation 'io.ebean:ebean-annotation:7.7'
-    annotationProcessor 'io.ebean:querybean-generator:12.15.1'
+    implementation 'io.ebean:ebean-migration:13.7.0'
+    implementation 'io.ebean:ebean-annotation:8.3'
+    annotationProcessor 'io.ebean:querybean-generator:13.15.0'
 
     implementation 'com.konghq:unirest-java:3.14.2'
 
