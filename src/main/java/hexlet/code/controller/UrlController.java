@@ -9,10 +9,10 @@ import hexlet.code.util.UrlDetails;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

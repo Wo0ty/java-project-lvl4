@@ -53,7 +53,7 @@ public class App {
                 post(UrlController.ADD_URL);
                 path("{id}", () -> {
                     get(UrlController.SHOW_URL);
-                    post("/check", UrlController.CHECK_URL);
+                    post("/checks", UrlController.CHECK_URL);
                 });
             });
         });
