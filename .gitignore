@@ -5,6 +5,6 @@
 build
 
 # Ignore idea directory
-.idea
+app/.idea
 
 .db
