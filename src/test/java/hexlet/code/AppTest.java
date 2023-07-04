@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,17 +24,19 @@ public final class AppTest {
     private static Database database;
     private static MockWebServer mockWebServer;
 
-   @BeforeAll
+
+    //private final static S
+    @BeforeAll
     public static void beforeAll() throws IOException {
+        final int port = 8090;
         app = App.getApp();
-        app.start(8090);
-        int port = app.port();
+        app.start(port);
         baseUrl = "http://localhost:" + port;
 
         database = DB.getDefault();
 
-       mockWebServer = new MockWebServer();
-       mockWebServer.start();
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
     }
 
     @BeforeEach
@@ -52,7 +55,7 @@ public final class AppTest {
     void testIndex() {
         HttpResponse<String> response = Unirest.get(baseUrl).asString();
 
-        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response.getBody()).contains("Page Analyzer");
     }
 }
