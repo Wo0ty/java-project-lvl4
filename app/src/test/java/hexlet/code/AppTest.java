@@ -13,6 +13,8 @@ import kong.unirest.Unirest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
+//import org.junit.Assert;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -149,5 +151,55 @@ public final class AppTest {
         assertThat(body).contains("test description");
         assertThat(body).contains("Test H1");
         assertThat(body).contains("200");
+    }
+
+    @Test
+    void testAddInvalidUrl() {
+        List<Url> urlsBeforeRequest = new QUrl().findList();
+
+        String invalidUrl = "wrong-url";
+        HttpResponse<String> responsePost = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", invalidUrl)
+                .asString();
+
+        List<Url> urlsAfterRequest = new QUrl().findList();
+        assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responsePost.getBody()).contains("Incorrect URL");
+
+        Assert.assertEquals(urlsBeforeRequest, urlsAfterRequest);
+    }
+
+    @Test
+    void testAddExistingUrl() {
+        String mockUrl = mockWebServer.url("").toString().replaceAll("/$", "");
+
+        HttpResponse<String> responsePost = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", mockUrl)
+                .asString();
+
+        assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        Url url = new QUrl().name.equalTo(mockUrl).findOne();
+        List<Url> urlsAfterFirstAdd = new QUrl().findList();
+
+        HttpResponse<String> repeatResponse = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", mockUrl)
+                .asString();
+
+        List<Url> urlsAfterSecondAdd = new QUrl().findList();
+        Assert.assertEquals(urlsAfterFirstAdd, urlsAfterSecondAdd);
+
+        assertThat(repeatResponse.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(repeatResponse.getBody()).contains("Url already exists");
+
+        HttpResponse<String> responseGet = Unirest
+                .get(baseUrl + "/urls")
+                .asString();
+
+        String body = responseGet.getBody();
+        assertThat(responseGet.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responseGet.getBody()).contains(mockUrl);
     }
 }

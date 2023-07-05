@@ -64,19 +64,22 @@ public final class UrlController {
     public static final Handler ADD_URL = ctx -> {
         String name = ctx.formParam("url");
         String checkedUrl = "";
+        URL parsedUrl;
 
         try {
-            URL aURL = new URL(name);
-            checkedUrl = aURL.getProtocol() + "://" +  aURL.getHost();
-            if (aURL.getPort() > 0) {
-                checkedUrl = checkedUrl + ":" +  aURL.getPort();
-            }
+            parsedUrl = new URL(name);
         } catch (MalformedURLException e) {
             LOGGER.info("Invalid URL");
             ctx.sessionAttribute("flash", "Incorrect URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.render("/index.html");
             return;
+        }
+
+        checkedUrl = parsedUrl.getProtocol() + "://" +  parsedUrl.getHost();
+
+        if (parsedUrl.getPort() > 0) {
+            checkedUrl = checkedUrl + ":" +  parsedUrl.getPort();
         }
 
         Url url = new Url(checkedUrl);
