@@ -70,7 +70,7 @@ public final class UrlController {
             parsedUrl = new URL(name);
         } catch (MalformedURLException e) {
             LOGGER.info("Invalid URL");
-            ctx.sessionAttribute("flash", "Incorrect URL");
+            ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.render("/index.html");
             return;
@@ -88,7 +88,7 @@ public final class UrlController {
                 .findOne();
 
         if (dbUrl != null) {
-            ctx.sessionAttribute("flash", "Url already exists");
+            ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.attribute("url", url);
             ctx.render("/index.html");
@@ -97,7 +97,7 @@ public final class UrlController {
 
         url.save();
 
-        ctx.sessionAttribute("flash", "Page added successfully");
+        ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.render("/index.html");
     };
@@ -159,10 +159,10 @@ public final class UrlController {
             LOGGER.info("URL {} was checked, saving parsed data to database", url.getName());
             checkResult.save();
 
-            ctx.sessionAttribute("flash", "Page verified successfully");
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
             ctx.sessionAttribute("flash-type", "success");
         } catch (UnirestException e) {
-            ctx.sessionAttribute("flash", "Failed to check page");
+            ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
         }
         ctx.redirect("/urls/" + id);

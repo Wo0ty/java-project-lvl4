@@ -65,7 +65,7 @@ public final class AppTest {
         HttpResponse<String> response = Unirest.get(baseUrl).asString();
 
         assertThat(response.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(response.getBody()).contains("Page Analyzer");
+        assertThat(response.getBody()).contains("Анализатор страниц");
     }
 
     @Test
@@ -165,7 +165,7 @@ public final class AppTest {
 
         List<Url> urlsAfterRequest = new QUrl().findList();
         assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(responsePost.getBody()).contains("Incorrect URL");
+        assertThat(responsePost.getBody()).contains("Некорректный URL");
 
         Assert.assertEquals(urlsBeforeRequest, urlsAfterRequest);
     }
@@ -192,7 +192,7 @@ public final class AppTest {
         Assert.assertEquals(urlsAfterFirstAdd, urlsAfterSecondAdd);
 
         assertThat(repeatResponse.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(repeatResponse.getBody()).contains("Url already exists");
+        assertThat(repeatResponse.getBody()).contains("Страница уже существует");
 
         HttpResponse<String> responseGet = Unirest
                 .get(baseUrl + "/urls")

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="ru" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/application.html}">
 
 <section layout:fragment="content">
     <div class="container-lg mt-5">
-        <h1 th:text="'Page ' + ${url.getName()}"></h1>
+        <h1 th:text="'Сайт ' + ${url.getName()}"></h1>
 
         <table class="table table-bordered table-hover mt-3">
             <tbody>
@@ -13,29 +13,29 @@
                 <td th:text="${url.getId()}"></td>
             </tr>
             <tr>
-                <td>Name</td>
+                <td>Имя</td>
                 <td th:text="${url.getName()}"></td>
             </tr>
             <tr>
-                <td>Created at</td>
+                <td>Дата создания</td>
                 <td th:text="${#temporals.format(url.getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></td>
             </tr>
             </tbody>
         </table>
 
-        <h2 class="mt-5">Checks</h2>
+        <h2 class="mt-5">Проверки</h2>
         <form method="post" th:action="@{/urls/{id}/checks(id=${url.getId()})}">
-            <button type="submit" class="btn btn-primary">Check page</button>
+            <button type="submit" class="btn btn-primary">Запустить проверку</button>
         </form>
 
         <table class="table table-bordered table-hover mt-3">
             <thead>
             <th class="col-1">ID</th>
-            <th class="col-1">Code</th>
+            <th class="col-1">Код ответа</th>
             <th>Title</th>
             <th>H1</th>
             <th>Description</th>
-            <th class="col-2">Check date</th>
+            <th class="col-2">Дата проверки</th>
             </thead>
             <tbody>
             <tr>
