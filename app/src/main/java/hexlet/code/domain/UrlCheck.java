@@ -26,15 +26,12 @@ public final class UrlCheck extends Model {
     @WhenCreated
     private Instant createdAt;
 
-    public UrlCheck() {
-
-    }
-
     public UrlCheck(int statusCode, String title, String h1, String description, Url url) {
         this.statusCode = statusCode;
         this.title = title;
         this.h1 = h1;
         this.description = description;
+        this.url = url;
     }
 
     public long getId() {

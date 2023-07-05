@@ -118,6 +118,8 @@ public final class UrlController {
                 .orderBy().id.asc()
                 .findList();
 
+        LOGGER.info("Found {} url checks for ID {} ", urlChecks.size(), id);
+
         ctx.attribute("url", url);
         ctx.attribute("urlChecks", urlChecks);
         ctx.render("show.html");
