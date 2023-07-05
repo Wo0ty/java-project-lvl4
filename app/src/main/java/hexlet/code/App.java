@@ -52,7 +52,7 @@ public class App {
                 get(UrlController.URL_LIST);
                 post(UrlController.ADD_URL);
                 path("{id}", () -> {
-                    get(UrlController.SHOW_URL);
+                    get(UrlController.LIST_URLS);
                     post("/checks", UrlController.CHECK_URL);
                 });
             });

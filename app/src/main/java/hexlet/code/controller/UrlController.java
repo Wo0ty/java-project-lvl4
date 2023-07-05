@@ -72,7 +72,7 @@ public final class UrlController {
             LOGGER.info("Invalid URL");
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.render("/index.html");
+            ctx.redirect("/");
             return;
         }
 
@@ -91,7 +91,7 @@ public final class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.attribute("url", url);
-            ctx.render("/index.html");
+            ctx.redirect("/urls");
             return;
         }
 
@@ -99,10 +99,10 @@ public final class UrlController {
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
-        ctx.render("/index.html");
+        ctx.redirect("/urls");
     };
 
-    public static final Handler SHOW_URL = ctx -> {
+    public static final Handler LIST_URLS = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
         LOGGER.info("Preparing the page for url with ID {} ", id);

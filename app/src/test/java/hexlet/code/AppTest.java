@@ -34,6 +34,8 @@ public final class AppTest {
     private static String baseUrl;
     private static Database database;
     private static MockWebServer mockWebServer;
+    public static final int REDIRECT_STATUS_CODE = 302;
+    public static final int SUCCESS_STATUS_CODE = 200;
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -78,7 +80,7 @@ public final class AppTest {
         assertThat(body).contains("https://test.net");
         assertThat(body).contains("01/01/2022 12:00");
         assertThat(body).contains("200");
-        assertThat(response.getBody()).contains("Page Analyzer");
+        assertThat(response.getBody()).contains("Анализатор страниц");
     }
 
     @Test
@@ -90,7 +92,9 @@ public final class AppTest {
                 .field("url", mockUrl)
                 .asString();
 
-        assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responsePost.getStatus()).isEqualTo(REDIRECT_STATUS_CODE);
+        assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/urls");
+
         Url url = new QUrl().name.equalTo(mockUrl).findOne();
         assertThat(url).isNotNull();
 
@@ -99,8 +103,9 @@ public final class AppTest {
                 .asString();
 
         String body = responseGet.getBody();
-        assertThat(responseGet.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(responseGet.getBody()).contains(mockUrl);
+        assertThat(responseGet.getStatus()).isEqualTo(SUCCESS_STATUS_CODE);
+        assertThat(body).contains(mockUrl);
+        assertThat(body).contains("Страница успешно добавлена");
     }
 
     @Test
@@ -110,7 +115,7 @@ public final class AppTest {
         String mockBodyResponse = Files.readString(path);
         MockResponse mockResponse = new MockResponse()
                 .setBody(mockBodyResponse)
-                .setResponseCode(HttpURLConnection.HTTP_OK);
+                .setResponseCode(SUCCESS_STATUS_CODE);
 
         mockWebServer.enqueue(mockResponse);
         Url url = new Url(mockUrl);
@@ -129,7 +134,7 @@ public final class AppTest {
                 .get(baseUrl + "/urls")
                 .asString();
 
-        assertThat(responseListUrls.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responseListUrls.getStatus()).isEqualTo(SUCCESS_STATUS_CODE);
         assertThat(responseListUrls.getBody()).contains(mockUrl);
 
         HttpResponse<Empty> responseAddNewCheck = Unirest
@@ -164,8 +169,8 @@ public final class AppTest {
                 .asString();
 
         List<Url> urlsAfterRequest = new QUrl().findList();
-        assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(responsePost.getBody()).contains("Некорректный URL");
+        assertThat(responsePost.getStatus()).isEqualTo(REDIRECT_STATUS_CODE);
+        assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/");
 
         Assert.assertEquals(urlsBeforeRequest, urlsAfterRequest);
     }
@@ -179,7 +184,8 @@ public final class AppTest {
                 .field("url", mockUrl)
                 .asString();
 
-        assertThat(responsePost.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responsePost.getStatus()).isEqualTo(REDIRECT_STATUS_CODE);
+
         Url url = new QUrl().name.equalTo(mockUrl).findOne();
         List<Url> urlsAfterFirstAdd = new QUrl().findList();
 
@@ -191,15 +197,16 @@ public final class AppTest {
         List<Url> urlsAfterSecondAdd = new QUrl().findList();
         Assert.assertEquals(urlsAfterFirstAdd, urlsAfterSecondAdd);
 
-        assertThat(repeatResponse.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
-        assertThat(repeatResponse.getBody()).contains("Страница уже существует");
+        assertThat(repeatResponse.getStatus()).isEqualTo(REDIRECT_STATUS_CODE);
+        assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/urls");
+
 
         HttpResponse<String> responseGet = Unirest
                 .get(baseUrl + "/urls")
                 .asString();
 
         String body = responseGet.getBody();
-        assertThat(responseGet.getStatus()).isEqualTo(HttpURLConnection.HTTP_OK);
+        assertThat(responseGet.getStatus()).isEqualTo(SUCCESS_STATUS_CODE);
         assertThat(responseGet.getBody()).contains(mockUrl);
     }
 }
