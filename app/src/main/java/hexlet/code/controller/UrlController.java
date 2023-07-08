@@ -68,6 +68,8 @@ public final class UrlController {
         String checkedUrl = "";
         URL parsedUrl;
 
+        LOGGER.info("Start adding URL '{}' to the database", name);
+
         try {
             parsedUrl = new URL(name);
         } catch (MalformedURLException e) {
@@ -90,6 +92,7 @@ public final class UrlController {
                 .findOne();
 
         if (dbUrl != null) {
+            LOGGER.info("URL '{}' has already added to the database", checkedUrl);
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.attribute("url", url);
@@ -98,7 +101,7 @@ public final class UrlController {
         }
 
         url.save();
-
+        LOGGER.info("URL '{}' successfully added to the database", checkedUrl);
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.redirect("/urls");
@@ -107,7 +110,7 @@ public final class UrlController {
     public static final Handler LIST_URLS = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
-        LOGGER.info("Preparing the page for url with ID {} ", id);
+        LOGGER.info("Preparing page for url with ID {} ", id);
 
         Url url = new QUrl()
                 .id.equalTo(id)
