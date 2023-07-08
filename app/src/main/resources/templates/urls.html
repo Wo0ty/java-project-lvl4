@@ -15,11 +15,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="url : ${urls}" th:with="urlDetails=${urlLastCheckDetails.get(url)}">
+            <tr th:each="url : ${urls}" th:with="urlCheck=${urlChecks.get(url.getId())}">
                 <td th:text="${url.getId()}"></td>
                 <td><a th:href="@{/urls/{id}(id=${url.getId()})}" th:text="${url.getName()}"></a></td>
-                <td th:text="${urlDetails.getLastCheckTime()}"></td>
-                <td th:text="${urlDetails.getStatusCode()}"></td>
+                <td th:text="${urlCheck} ? ${#temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm')} : ''"></td>
+                <td th:text="${urlCheck} ? ${urlCheck.getStatusCode()} : ''"></td>
             </tr>
             </tbody>
         </table>
@@ -27,13 +27,13 @@
         <nav aria-label="Page navigation" th:if="${#lists.size(pages)}">
             <ul class="pagination justify-content-center mt-5">
                 <li th:class="'page-item' + ${currentPage <= 1 ? ' disabled' : ''}">
-                    <a class="page-link" th:href="@{/urls(page=${currentPage - 1})}">Previous</a>
+                    <a class="page-link" th:href="@{/urls(page=${currentPage - 1})}">Предыдущая</a>
                 </li>
                 <li th:each="page : ${pages}" th:class="'page-item' + ${currentPage == page ? ' active' : ''}">
                     <a class="page-link" th:href="@{/urls(page=${page})}" th:text="${page}"></a>
                 </li>
                 <li th:class="'page-item' + ${currentPage >= #lists.size(pages) ? ' disabled' : ''}">
-                    <a class="page-link" th:href="@{/urls(page=${currentPage + 1})}">Next</a>
+                    <a class="page-link" th:href="@{/urls(page=${currentPage + 1})}">Следующая</a>
                 </li>
             </ul>
         </nav>

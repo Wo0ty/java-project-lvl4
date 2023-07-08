@@ -4,8 +4,6 @@ import hexlet.code.domain.Url;
 import hexlet.code.domain.UrlCheck;
 import hexlet.code.domain.query.QUrl;
 import hexlet.code.domain.query.QUrlCheck;
-import hexlet.code.util.ResponseParser;
-import hexlet.code.util.UrlDetails;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
@@ -13,6 +11,9 @@ import io.javalin.http.NotFoundResponse;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,14 +49,15 @@ public final class UrlController {
                 .boxed()
                 .collect(Collectors.toList());
 
-        Map<Url, UrlDetails> urlLastCheckDetails = urls.stream()
-                .collect(Collectors.toMap(
-                        (url) -> url,
-                        UrlDetails::new));
+        Map<Long, UrlCheck> urlChecks = new QUrlCheck()
+                .url.id.asMapKey()
+                .orderBy()
+                    .createdAt.desc()
+                .findMap();
 
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
-        ctx.attribute("urlLastCheckDetails", urlLastCheckDetails);
+        ctx.attribute("urlChecks", urlChecks);
         ctx.attribute("urls", urls);
 
         ctx.render("urls.html");
@@ -147,12 +149,16 @@ public final class UrlController {
                     .get(url.getName())
                     .asString();
 
-            ResponseParser urlParser = new ResponseParser(response);
+            Document body = Jsoup.parse(response.getBody());
 
-            int statusCode = urlParser.getStatusCode();
-            String title = urlParser.getTitle();
-            String h1 = urlParser.getH1();
-            String description = urlParser.getDescription();
+            int statusCode = response.getStatus();
+            String title = body.title();
+
+            Element headerElement = body.selectFirst("h1");
+            String h1 = headerElement != null ? headerElement.text() : "";
+
+            Element descriptionElement = body.selectFirst("meta[name=description]");
+            String description = descriptionElement != null ? descriptionElement.attr("content") : "";
 
             UrlCheck checkResult = new UrlCheck(statusCode, title, h1, description, url);
 
@@ -164,7 +170,11 @@ public final class UrlController {
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", e.getMessage());
+            ctx.sessionAttribute("flash-type", "danger");
         }
+
         ctx.redirect("/urls/" + id);
     };
 }
