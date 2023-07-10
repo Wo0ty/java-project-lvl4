@@ -10,7 +10,7 @@ install:
 clean:
 	./gradlew clean
 
-start: build
+start:
 	APP_ENV=development ./gradlew run
 
 start-dist:
