@@ -4,6 +4,18 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/8c478f840717af74cb1e/maintainability)](https://codeclimate.com/github/Wo0ty/java-project-lvl4/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8c478f840717af74cb1e/test_coverage)](https://codeclimate.com/github/Wo0ty/java-project-lvl4/test_coverage)
 
-[Развернутое приложение](https://web-production-7d99.up.railway.app/)
+Web application based on the **Javalin** and **Ebean ORM** frameworks for analyzing web pages. The application checks the availability of the specified page. Information about the entered URLs and the results of the checks are saved in a database.
+## System requirements
+- JDK 17
+- Gradle 7.4
+- GNU Make
 
-Веб сайт на базе фреймворка **Javalin** для анализа веб - страниц. Приложение проверяет доступность указанной страницы. Информация о введенных URL и результатах проверки сохраняется в базу данных.
+## Setup
+```shell
+make build
+make start
+# Open http://localhost:8090
+```
+
+## Demo
+You can try Page Analyzer [on railway](https://web-production-7d99.up.railway.app/).
