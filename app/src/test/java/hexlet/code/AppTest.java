@@ -13,7 +13,6 @@ import kong.unirest.Unirest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-//import org.junit.Assert;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -124,12 +123,6 @@ public final class AppTest {
 
         assertThat(url).isNotNull();
 
-        List<UrlCheck> checksBeforeAdding = new QUrlCheck()
-                .id.equalTo(id)
-                .findList();
-
-        assertThat(checksBeforeAdding).isEmpty();
-
         HttpResponse<String> responseListUrls = Unirest
                 .get(baseUrl + "/urls")
                 .asString();
@@ -152,10 +145,13 @@ public final class AppTest {
                 .asString();
 
         String body = responseGet.getBody();
-        assertThat(body).contains(mockUrl);
-        assertThat(body).contains("test description");
-        assertThat(body).contains("Test H1");
-        assertThat(body).contains("200");
+
+        UrlCheck actualCheckUrl = new QUrlCheck().id.equalTo(id).findOne();
+
+        assertThat(actualCheckUrl).isNotNull();
+        assertThat(actualCheckUrl.getStatusCode()).isEqualTo(SUCCESS_STATUS_CODE);
+        assertThat(actualCheckUrl.getDescription()).isEqualTo("test description");
+        assertThat(actualCheckUrl.getTitle()).isEqualTo("test page");
     }
 
     @Test

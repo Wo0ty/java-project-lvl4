@@ -65,7 +65,6 @@ public final class UrlController {
 
     public static final Handler ADD_URL = ctx -> {
         String name = ctx.formParam("url");
-        String checkedUrl = "";
         URL parsedUrl;
 
         LOGGER.info("Start adding URL '{}' to the database", name);
@@ -80,7 +79,7 @@ public final class UrlController {
             return;
         }
 
-        checkedUrl = parsedUrl.getProtocol() + "://" +  parsedUrl.getHost();
+        String checkedUrl = parsedUrl.getProtocol() + "://" +  parsedUrl.getHost();
 
         if (parsedUrl.getPort() > 0) {
             checkedUrl = checkedUrl + ":" +  parsedUrl.getPort();
