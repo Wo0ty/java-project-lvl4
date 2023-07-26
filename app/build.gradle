@@ -14,10 +14,10 @@ repositories {
     mavenCentral()
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(20)
 
 compileJava {
-    options.release = 17
+    options.release = 20
     options.encoding = "UTF-8"
 }
 
