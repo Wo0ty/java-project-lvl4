@@ -6,8 +6,8 @@
 
 Web application based on the **Javalin** and **Ebean ORM** frameworks for analyzing web pages. The application checks the availability of the specified page. Information about the entered URLs and the results of the checks are saved in a database.
 ## System requirements
-- JDK 17
-- Gradle 7.4
+- JDK 20
+- Gradle 8.2
 - GNU Make
 
 ## Setup
@@ -18,4 +18,4 @@ make start
 ```
 
 ## Demo
-You can try Page Analyzer [on railway](https://web-production-7d99.up.railway.app/).
+You can try Page Analyzer [on render](https://page-analyzer-avrw.onrender.com).
